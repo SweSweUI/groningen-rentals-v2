@@ -1,41 +1,36 @@
-# Project Cleanup and Consolidation Tasks
+# GroningenRentals Project Todos
 
-## ✅ MAJOR FEATURES COMPLETE ✅
-- [x] **FIXED: Real Gruno Scraper Working** - Created Next.js API route `/api/scrape-properties`
-- [x] **FIXED: Real Property Prices** - Enhanced scraper to extract actual rental prices from broker websites
-- [x] **FIXED: Real Listing Dates** - Added `listedDate` and `daysAgo` fields with Dutch date parsing
-- [x] **FIXED: Frontend Date Display** - Updated UI to show correct "Listed X days ago" instead of "Listed today"
+## Completed ✅
+- [x] Fixed Netlify → Vercel deployment configuration
+- [x] Fixed security.ts build-time validation issue
+- [x] Fixed real-property-scraper.ts to use Vercel API routes
+- [x] Deployed fixes to Vercel
+- [x] Confirmed 3 agencies working: Gruno (17), VdM (6), Rotsvast (2)
 
-## ✅ MAJOR MILESTONE: 9 Total Agencies Complete! ✅
-- [x] **completed** - All 9 agencies scraping system working
-- [x] **completed** - User authentication with secure login/logout
-- [x] **completed** - Email notification subscription system
-- [x] **completed** - Admin dashboard with real-time stats
-- [x] **completed** - Auto-scraping every 10 minutes
-- [x] **completed** - Fixed build issues (async functions, JWT types, Suspense)
+## In Progress 🔄
+- [ ] Testing scraper functionality after Vercel deployment
+- [ ] Debugging 6 non-working agencies (Nova, DC Wonen, 123Wonen, MVGM, K&P, Expat)
 
-## 🚨 DEPLOYMENT STATUS 🚨
-- [x] **FIXED** - Build completes successfully locally with npm and bun
-- [x] **FIXED** - Added Node.js runtime declarations to all API routes
-- [x] **FIXED** - Created proper environment configuration
-- [x] **FIXED** - Updated netlify.toml with Node.js 18 and npm build
-- [x] **COMPLETED** - Applied Netlify Edge Runtime fixes (still failing)
-- [x] **TESTED** - Environment variables configured in Netlify
-- [ ] **IN_PROGRESS** - Netlify still failing - trying Vercel deployment
-- [ ] **TODO** - Upgrade @netlify/plugin-nextjs to version 5+
-- [ ] **TODO** - Add NETLIFY_NEXT_PLUGIN_SKIP environment variable
-- [ ] **TODO** - Try clean Netlify deployment
-- [ ] **TODO** - Consider alternative deployment platform (Vercel) if fixes fail
+## Priority Tasks 🔥
+1. [x] Test site after deployment - **DONE: 3/9 agencies working**
+2. [ ] Create real-time status monitoring dashboard for scrapers
+3. [ ] Debug and fix the 6 non-working agencies
+4. [ ] Add browser console logging for scraping activity
+5. [ ] Implement error handling and retry logic for failed scrapers
 
-## Technical Implementation:
-- Both new scrapers need individual property page fetching for real dates/prices
-- Add proper Dutch date parsing for each broker's format
-- Implement price extraction patterns specific to each site
-- Handle edge cases (missing data, failed requests, etc.)
-- Update concurrency in Promise.allSettled for 4 brokers
+## Agency Status 📊
+- ✅ Gruno Verhuur: 17 properties (working)
+- ✅ Van der Meulen: 6 properties (working)
+- ✅ Rotsvast: 2 properties (working)
+- ❌ Nova Vastgoed: 0 properties (needs debugging)
+- ❌ DC Wonen: 0 properties (needs debugging)
+- ❌ 123Wonen: 0 properties (needs debugging)
+- ❌ MVGM Wonen: 0 properties (needs debugging)
+- ❌ K&P Makelaars: 0 properties (needs debugging)
+- ❌ Expat Groningen: 0 properties (needs debugging)
 
-## Next Steps After 4 Brokers:
-- [ ] Add comprehensive error handling and retry logic
-- [ ] Implement caching to reduce broker website load
-- [ ] Add property change notifications
-- [ ] Consider deployment optimizations
+## Next Steps
+1. Create status monitoring component
+2. Test API directly to see detailed error logs
+3. Fix agency-specific scraping issues
+4. Add retry mechanisms for failed scrapers

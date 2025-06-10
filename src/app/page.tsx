@@ -57,7 +57,7 @@ export default function HomePage() {
       setShowLogin(false);
       setLoginForm({ username: '', password: '' });
     } else {
-      
+
     }
   };
 
@@ -69,15 +69,16 @@ export default function HomePage() {
         setNewListingsToday(properties.filter(p => (p.daysAgo || p.listedDays) === 0).length);
 
         // Calculate real agency counts for all 9 agencies
-        const grunoProperties = properties.filter(p => p.source.toLowerCase().includes('gruno'));
-        const vanDerMeulenProperties = properties.filter(p => p.source.toLowerCase().includes('van der meulen') || p.source.toLowerCase().includes('vandermeulen'));
-        const rotsVastProperties = properties.filter(p => p.source.toLowerCase().includes('rotsvast'));
-        const novaProperties = properties.filter(p => p.source.toLowerCase().includes('nova'));
-        const dcWonenProperties = properties.filter(p => p.source.toLowerCase().includes('dc wonen'));
-        const wonen123Properties = properties.filter(p => p.source.toLowerCase().includes('123wonen'));
-        const mvgmProperties = properties.filter(p => p.source.toLowerCase().includes('mvgm'));
-        const kpMakelaarsProperties = properties.filter(p => p.source.toLowerCase().includes('k&p'));
-        const expatGroningenProperties = properties.filter(p => p.source.toLowerCase().includes('expat'));
+        const getAgencyName = (p: any) => (p.agent || p.source || '').toLowerCase();
+        const grunoProperties = properties.filter(p => getAgencyName(p).includes('gruno'));
+        const vanDerMeulenProperties = properties.filter(p => getAgencyName(p).includes('van der meulen') || getAgencyName(p).includes('vandermeulen'));
+        const rotsVastProperties = properties.filter(p => getAgencyName(p).includes('rotsvast'));
+        const novaProperties = properties.filter(p => getAgencyName(p).includes('nova'));
+        const dcWonenProperties = properties.filter(p => getAgencyName(p).includes('dc wonen'));
+        const wonen123Properties = properties.filter(p => getAgencyName(p).includes('123wonen'));
+        const mvgmProperties = properties.filter(p => getAgencyName(p).includes('mvgm'));
+        const kpMakelaarsProperties = properties.filter(p => getAgencyName(p).includes('k&p'));
+        const expatGroningenProperties = properties.filter(p => getAgencyName(p).includes('expat'));
 
         setAgencyCounts({
           gruno: grunoProperties.length,
@@ -92,7 +93,7 @@ export default function HomePage() {
         });
 
         // Show 10 sample properties on homepage (prioritize Gruno properties)
-        const otherProperties = properties.filter(p => !p.source.toLowerCase().includes('gruno'));
+        const otherProperties = properties.filter(p => !getAgencyName(p).includes('gruno'));
         const sampleProps = [...grunoProperties.slice(0, 8), ...otherProperties.slice(0, 2)];
         setSampleProperties(sampleProps);
 
@@ -129,15 +130,16 @@ export default function HomePage() {
               setNewListingsToday(properties.filter(p => (p.daysAgo || p.listedDays) === 0).length);
 
               // Calculate real agency counts for all 9 agencies
-              const grunoProperties = properties.filter(p => p.source.toLowerCase().includes('gruno'));
-              const vanDerMeulenProperties = properties.filter(p => p.source.toLowerCase().includes('van der meulen') || p.source.toLowerCase().includes('vandermeulen'));
-              const rotsVastProperties = properties.filter(p => p.source.toLowerCase().includes('rotsvast'));
-              const novaProperties = properties.filter(p => p.source.toLowerCase().includes('nova'));
-              const dcWonenProperties = properties.filter(p => p.source.toLowerCase().includes('dc wonen'));
-              const wonen123Properties = properties.filter(p => p.source.toLowerCase().includes('123wonen'));
-              const mvgmProperties = properties.filter(p => p.source.toLowerCase().includes('mvgm'));
-              const kpMakelaarsProperties = properties.filter(p => p.source.toLowerCase().includes('k&p'));
-              const expatGroningenProperties = properties.filter(p => p.source.toLowerCase().includes('expat'));
+              const getAgencyName = (p: any) => (p.agent || p.source || '').toLowerCase();
+              const grunoProperties = properties.filter(p => getAgencyName(p).includes('gruno'));
+              const vanDerMeulenProperties = properties.filter(p => getAgencyName(p).includes('van der meulen') || getAgencyName(p).includes('vandermeulen'));
+              const rotsVastProperties = properties.filter(p => getAgencyName(p).includes('rotsvast'));
+              const novaProperties = properties.filter(p => getAgencyName(p).includes('nova'));
+              const dcWonenProperties = properties.filter(p => getAgencyName(p).includes('dc wonen'));
+              const wonen123Properties = properties.filter(p => getAgencyName(p).includes('123wonen'));
+              const mvgmProperties = properties.filter(p => getAgencyName(p).includes('mvgm'));
+              const kpMakelaarsProperties = properties.filter(p => getAgencyName(p).includes('k&p'));
+              const expatGroningenProperties = properties.filter(p => getAgencyName(p).includes('expat'));
 
               setAgencyCounts({
                 gruno: grunoProperties.length,
@@ -152,7 +154,7 @@ export default function HomePage() {
               });
 
               // Show 10 sample properties on homepage (prioritize Gruno properties)
-              const otherProperties = properties.filter(p => !p.source.toLowerCase().includes('gruno'));
+              const otherProperties = properties.filter(p => !getAgencyName(p).includes('gruno'));
               const sampleProps = [...grunoProperties.slice(0, 8), ...otherProperties.slice(0, 2)];
               setSampleProperties(sampleProps);
             } catch (error) {
