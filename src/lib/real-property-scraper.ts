@@ -73,18 +73,15 @@ export const scrapeAllRealProperties = async (): Promise<Property[]> => {
   }
 
   try {
-    console.log('🌐 Fetching real properties from Netlify function...');
+    console.log('🌐 Fetching real properties from API...');
 
     // Check if we're in development or production
     const baseUrl = typeof window !== 'undefined'
       ? window.location.origin
-      : process.env.NETLIFY_URL || 'http://localhost:3000';
+      : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
 
-    // Use Next.js API route in development, Netlify function in production
-    const isDevelopment = process.env.NODE_ENV === 'development' || baseUrl.includes('localhost');
-    const functionUrl = isDevelopment
-      ? `${baseUrl}/api/scrape-properties`
-      : `${baseUrl}/.netlify/functions/scrape-properties`;
+    // Always use Next.js API route for Vercel deployment
+    const functionUrl = `${baseUrl}/api/scrape-properties`;
 
     const response = await fetch(functionUrl, {
       method: 'GET',
@@ -94,7 +91,7 @@ export const scrapeAllRealProperties = async (): Promise<Property[]> => {
     });
 
     if (!response.ok) {
-      console.warn(`❌ Failed to fetch from Netlify function (${response.status}), using fallback`);
+      console.warn(`❌ Failed to fetch from API (${response.status}), using fallback`);
       console.log('🔄 Using LOCAL fallback properties with individual URLs');
       return getFallbackProperties();
     }
