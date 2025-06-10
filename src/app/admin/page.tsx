@@ -17,7 +17,9 @@ import {
   AlertTriangle,
   CheckCircle,
   TrendingUp,
-  Database
+  Database,
+  ExternalLink,
+  ArrowRight
 } from "lucide-react";
 import ScraperStatusMonitor from '@/components/ScraperStatusMonitor';
 
@@ -96,6 +98,8 @@ export default function AdminPage() {
 function AdminDashboard() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scraping, setScraping] = useState(false);
+  const [recentProperties, setRecentProperties] = useState<any[]>([]);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   const fetchStats = async () => {
@@ -120,11 +124,58 @@ function AdminDashboard() {
     }
   };
 
+  const fetchRecentProperties = async () => {
+    try {
+      const response = await fetch('/api/scrape-properties');
+      if (response.ok) {
+        const data = await response.json();
+        setRecentProperties(data.properties?.slice(0, 10) || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent properties:', error);
+    }
+  };
+
+  const manualScrape = async () => {
+    try {
+      setScraping(true);
+      console.log('🔄 Manual scrape initiated...');
+
+      const response = await fetch('/api/scrape-properties', {
+        method: 'GET',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Manual scrape completed:', data.count, 'properties');
+
+        // Refresh stats and properties
+        await Promise.all([fetchStats(), fetchRecentProperties()]);
+
+        // Show success message
+        alert(`✅ Scrape completed! Found ${data.count} properties from ${data.sources?.length || 0} agencies.`);
+      } else {
+        console.error('❌ Manual scrape failed:', response.statusText);
+        alert('❌ Scrape failed. Check console for details.');
+      }
+    } catch (error) {
+      console.error('❌ Manual scrape error:', error);
+      alert('❌ Scrape error. Check console for details.');
+    } finally {
+      setScraping(false);
+    }
+  };
+
   useEffect(() => {
     fetchStats();
+    fetchRecentProperties();
 
     // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchStats, 30000);
+    const interval = setInterval(() => {
+      fetchStats();
+      fetchRecentProperties();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -182,7 +233,11 @@ function AdminDashboard() {
             <Badge variant="outline" className="text-sm">
               Last refresh: {lastRefresh.toLocaleTimeString()}
             </Badge>
-            <Button onClick={fetchStats} disabled={loading}>
+            <Button onClick={manualScrape} disabled={scraping} variant="default">
+              <Activity className={`h-4 w-4 mr-2 ${scraping ? 'animate-spin' : ''}`} />
+              {scraping ? 'Scraping...' : 'Manual Scrape'}
+            </Button>
+            <Button onClick={() => { fetchStats(); fetchRecentProperties(); }} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -366,6 +421,86 @@ function AdminDashboard() {
             </Card>
           )}
         </div>
+
+        {/* Recent Properties Section */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-5 w-5 mr-2" />
+                Recent Properties ({recentProperties.length})
+                <Badge variant="secondary" className="ml-2">
+                  Live Data
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {recentProperties.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Database className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No properties loaded yet. Click "Manual Scrape" to fetch data.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {recentProperties.map((property, index) => (
+                    <div
+                      key={property.id || index}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="text-xs">
+                            {property.agent || property.source || 'Unknown'}
+                          </Badge>
+                          <div className="font-medium text-sm">
+                            {property.title || 'Untitled Property'}
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {property.location} • {property.size} • {property.rooms} rooms
+                          {property.daysAgo !== undefined && (
+                            <span className="ml-2">
+                              • Listed {property.daysAgo === 0 ? 'today' : `${property.daysAgo} days ago`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="font-bold text-green-600">
+                            €{property.price?.toLocaleString() || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">per month</div>
+                        </div>
+                        {property.sourceUrl && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => window.open(property.sourceUrl, '_blank')}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {recentProperties.length >= 10 && (
+                    <div className="text-center pt-4 border-t">
+                      <Button variant="outline" asChild>
+                        <Link href="/properties">
+                          View All Properties
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
         </div>
       </div>
     </ProtectedRoute>

@@ -67,21 +67,22 @@ export function sanitizeInput(input: string): string {
 // Rate limiting (simple in-memory implementation)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-export function checkRateLimit(identifier: string, limit: number = 10, windowMs: number = 60000): boolean {
+export function checkRateLimit(identifier: string, limit: number = 10, windowMs: number = 60000): { allowed: boolean; remaining: number; resetTime: number } {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
 
   if (!record || now > record.resetTime) {
-    rateLimitMap.set(identifier, { count: 1, resetTime: now + windowMs });
-    return true;
+    const resetTime = now + windowMs;
+    rateLimitMap.set(identifier, { count: 1, resetTime });
+    return { allowed: true, remaining: limit - 1, resetTime };
   }
 
   if (record.count >= limit) {
-    return false;
+    return { allowed: false, remaining: 0, resetTime: record.resetTime };
   }
 
   record.count++;
-  return true;
+  return { allowed: true, remaining: limit - record.count, resetTime: record.resetTime };
 }
 
 // Error sanitization
